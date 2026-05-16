@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>HP PAT 2026 — Mridul</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0a0a; --bg2:#111; --bg3:#1a1a1a; --bdr:#1f1f1f;
+  --or:#f97316; --bl:#3b82f6; --gr:#10b981; --pu:#8b5cf6;
+  --ye:#eab308; --re:#ef4444;
+  --t1:#f0f0f0; --t2:#9ca3af; --t3:#4b5563;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--t1);font-family:'Syne',sans-serif;max-width:480px;margin:0 auto;min-height:100vh}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* SCREENS */
+.scr{display:none;padding-bottom:84px;animation:fu .2s ease}
+.scr.on{display:block}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:50;background:var(--bg2);border-bottom:1px solid var(--bdr);padding:18px 20px 14px}
+.hdr-row{display:flex;justify-content:space-between;align-items:flex-start}
+.hdr-pre{font-size:10px;letter-spacing:.2em;color:var(--t3);font-weight:700;margin-bottom:2px}
+.hdr-big{font-size:20px;font-weight:800;line-height:1.1}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--bg2);border-top:1px solid var(--bdr);display:flex;z-index:100}
+.nb{flex:1;padding:10px 0 8px;background:none;border:none;cursor:pointer;font-family:'Syne',sans-serif;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--t3);transition:color .15s}
+.nb.on{color:var(--or)}
+.nb .ni{font-size:20px}
+.nb .nl{font-size:9px;letter-spacing:.08em;font-weight:700}
+
+/* UTILS */
+.px{padding:0 20px}
+.sl{font-size:10px;letter-spacing:.2em;color:var(--t3);font-weight:700;margin-bottom:10px}
+.card{background:var(--bg2);border:1px solid var(--bdr);border-radius:16px;padding:16px;margin-bottom:12px}
+
+/* PROGRESS BAR */
+.bt{height:6px;background:var(--bg3);border-radius:99px;overflow:hidden}
+.bf{height:100%;border-radius:99px;transition:width .4s ease}
+
+/* STATS GRID */
+.sg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+.sgc{background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:14px 8px;text-align:center}
+.sgn{font-size:24px;font-weight:800;line-height:1}
+.sgl{font-size:9px;color:var(--t3);letter-spacing:.08em;margin-top:4px}
+
+/* SLOT CARDS */
+.slot{background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color .2s,background .2s;user-select:none}
+.slot.done{border-color:var(--gr);background:rgba(16,185,129,.05)}
+.cbx{width:28px;height:28px;border-radius:8px;border:2px solid var(--t3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;transition:all .2s;color:transparent}
+.cbx.on{background:var(--gr);border-color:var(--gr);color:#fff}
+
+/* TOPIC ITEMS */
+.ti{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bdr);cursor:pointer;user-select:none}
+.ti:last-child{border-bottom:none}
+.td{width:24px;height:24px;border-radius:7px;border:2px solid var(--t3);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:all .2s}
+.td.prog{border-color:var(--ye);background:rgba(234,179,8,.1);color:var(--ye)}
+.td.done{border-color:var(--gr);background:var(--gr);color:#fff}
+.tt{font-size:13px;line-height:1.3;flex:1}
+.tt.dn{color:var(--t3);text-decoration:line-through}
+
+/* CALENDAR */
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.ch{font-size:9px;color:var(--t3);text-align:center;font-weight:700;padding-bottom:4px;letter-spacing:.05em}
+.cd{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;background:var(--bg3);color:var(--t3)}
+.cd.full{background:var(--gr);color:#fff}
+.cd.part{background:var(--ye);color:#000}
+.cd.tod{border:2px solid var(--or);color:var(--or);background:rgba(249,115,22,.08)}
+.cd.exam{background:var(--re);color:#fff}
+.cd.emp{background:transparent}
+
+/* SUBJECT BARS */
+.sr{margin-bottom:14px}
+.st{display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px}
+
+/* TABS */
+.tabs{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px}
+.tabs::-webkit-scrollbar{display:none}
+.tabb{padding:7px 16px;border-radius:10px;border:1px solid var(--bdr);background:var(--bg2);color:var(--t3);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.tabb.on{color:#fff;border-color:transparent}
+
+/* TARGET BOX */
+.tgtbox{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.3);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+/* WARN BOX */
+.wbox{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ SCREEN: DASHBOARD ═══════════════ -->
+<div class="scr on" id="s-dash">
+  <div class="hdr">
+    <div class="hdr-row">
+      <div><div class="hdr-pre">HP PAT 2026</div><div class="hdr-big">DASHBOARD</div></div>
+      <div id="d-badge"></div>
+    </div>
+    <div style="margin-top:14px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:11px;color:var(--t2)">Overall topic coverage</span>
+        <span class="mono" id="d-opct" style="font-size:11px;color:var(--t2)">0%</span>
+      </div>
+      <div class="bt"><div class="bf" id="d-obar" style="background:var(--or);width:0%"></div></div>
+    </div>
+  </div>
+  <div style="padding:16px 20px 0">
+    <div class="sg" id="d-sg"></div>
+    <div class="sl">TARGET</div>
+    <div class="tgtbox">
+      <div style="font-weight:700;color:var(--bl);font-size:13px;margin-bottom:6px">🎯 Government College Cut-off</div>
+      <div style="font-size:12px;color:#93c5fd;line-height:1.9">
+        Target Score: <strong>350+/600</strong><br>
+        Matlab: <strong>88+ questions sahi</strong> (150 mein se)<br>
+        Safe attempt: <strong>~100 questions</strong> (skip karo agar pata nahi)
+      </div>
+    </div>
+    <div class="sl">AAJ KA STATUS</div>
+    <div id="d-today" style="cursor:pointer" onclick="go('s-today')"></div>
+    <div class="sl">SUBJECT COVERAGE</div>
+    <div class="card" id="d-subj"></div>
+    <div class="wbox">
+      <div style="font-weight:700;color:var(--re);font-size:13px;margin-bottom:6px">⚠️ Negative Marking Rule</div>
+      <div style="font-size:12px;color:#fca5a5;line-height:1.8">
+        Sahi → <strong>+4 marks</strong> &nbsp;|&nbsp; Galat → <strong>−1 mark</strong><br>
+        <strong style="color:#fff">Rule: Agar 60% bhi confident nahi → SKIP</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN: TODAY ═══════════════ -->
+<div class="scr" id="s-today">
+  <div class="hdr">
+    <div class="hdr-row">
+      <div><div class="hdr-pre" id="t-date"></div><div class="hdr-big">AAJ KA<br>SCHEDULE</div></div>
+      <div id="t-badge"></div>
+    </div>
+    <div style="margin-top:12px"><div class="bt"><div class="bf" id="t-bar" style="background:var(--or);width:0%"></div></div></div>
+  </div>
+  <div style="padding:16px 20px 0">
+    <div id="t-slots"></div>
+    <div id="t-msg"></div>
+    <div class="sl" style="margin-top:8px">PHASE TIP</div>
+    <div class="card" id="t-ptip"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN: TOPICS ═══════════════ -->
+<div class="scr" id="s-topics">
+  <div class="hdr">
+    <div class="hdr-row">
+      <div><div class="hdr-pre">SYLLABUS</div><div class="hdr-big">TOPIC<br>TRACKER</div></div>
+      <div id="tp-badge"></div>
+    </div>
+  </div>
+  <div style="padding:16px 20px 0">
+    <div class="tabs" id="tp-tabs"></div>
+    <div id="tp-content"></div>
+    <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:12px;padding:12px 14px">
+      <div style="font-size:11px;color:var(--t2);line-height:1.9">
+        ⬜ <strong>Not Started</strong> — tap once &nbsp;→&nbsp;
+        🟡 <strong>Padh rha</strong> — tap twice &nbsp;→&nbsp;
+        ✅ <strong>Done</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN: HISTORY ═══════════════ -->
+<div class="scr" id="s-hist">
+  <div class="hdr">
+    <div class="hdr-row">
+      <div><div class="hdr-pre">CALENDAR</div><div class="hdr-big">HISTORY &<br>STATS</div></div>
+      <div id="h-streak"></div>
+    </div>
+  </div>
+  <div style="padding:16px 20px 0">
+    <div class="sl">22 DIN KA SAFAR — MAY 17 → JUN 7</div>
+    <div class="card">
+      <div class="cg">
+        <div class="ch">SUN</div><div class="ch">MON</div><div class="ch">TUE</div>
+        <div class="ch">WED</div><div class="ch">THU</div><div class="ch">FRI</div><div class="ch">SAT</div>
+      </div>
+      <div class="cg" id="h-cal" style="margin-top:4px"></div>
+      <div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap">
+        <span style="font-size:10px;color:var(--t2);display:flex;align-items:center;gap:5px">
+          <span style="width:12px;height:12px;background:var(--gr);border-radius:3px;display:inline-block"></span>Full day ✅
+        </span>
+        <span style="font-size:10px;color:var(--t2);display:flex;align-items:center;gap:5px">
+          <span style="width:12px;height:12px;background:var(--ye);border-radius:3px;display:inline-block"></span>Partial 🟡
+        </span>
+        <span style="font-size:10px;color:var(--t2);display:flex;align-items:center;gap:5px">
+          <span style="width:12px;height:12px;background:var(--re);border-radius:3px;display:inline-block"></span>Exam Day 🔴
+        </span>
+      </div>
+    </div>
+    <div class="sl">PHASE BREAKDOWN</div>
+    <div id="h-phases"></div>
+    <div class="sl">OVERALL STATS</div>
+    <div id="h-stats"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <button class="nb on" data-s="s-dash" onclick="go('s-dash')">
+    <span class="ni">🏠</span><span class="nl">HOME</span>
+  </button>
+  <button class="nb" data-s="s-today" onclick="go('s-today')">
+    <span class="ni">📅</span><span class="nl">TODAY</span>
+  </button>
+  <button class="nb" data-s="s-topics" onclick="go('s-topics')">
+    <span class="ni">📚</span><span class="nl">TOPICS</span>
+  </button>
+  <button class="nb" data-s="s-hist" onclick="go('s-hist')">
+    <span class="ni">📊</span><span class="nl">HISTORY</span>
+  </button>
+</nav>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════
+const START = new Date('2026-05-17T00:00:00');
+const EXAM  = new Date('2026-06-07T00:00:00');
+
+const SLOTS = [
+  {id:'math', e:'📐', n:'Math',               time:'7:00 – 9:00 AM',    tip:'2 hrs — Roz, skip mat karna. Sabse important.'},
+  {id:'phys', e:'⚡', n:'Physics',            time:'11:00 AM – 12:30 PM',tip:'1.5 hrs — 50 questions hai exam mein.'},
+  {id:'sci',  e:'🧪', n:'Chem / English',     time:'4:00 – 5:00 PM',    tip:'1 hr — Even days Chem, Odd days English.'},
+  {id:'prac', e:'📝', n:'Practice Questions', time:'9:00 – 10:00 PM',   tip:'20 prev year questions. Negative marking dhyan mein rakh.'},
+];
+
+const PHASES = [
+  {
+    id:'p1', lbl:'Phase 1', sub:'Foundation', days:'May 17–23', col:'#f97316',
+    subjs:[
+      {id:'p1m', lbl:'Math 📐',    col:'#f97316', items:[
+        {id:'p1m1',lbl:'Real Numbers & Polynomials'},
+        {id:'p1m2',lbl:'Linear Equations (1 & 2 variables)'},
+        {id:'p1m3',lbl:'Percentage, Ratio & Profit/Loss'},
+        {id:'p1m4',lbl:'Mensuration — Area & Volume basics'},
+      ]},
+      {id:'p1p', lbl:'Physics ⚡', col:'#3b82f6', items:[
+        {id:'p1p1',lbl:'Motion — Distance, Speed, Velocity, Acceleration'},
+        {id:'p1p2',lbl:'Force & Newton\'s 3 Laws'},
+        {id:'p1p3',lbl:'Work, Energy & Power'},
+      ]},
+      {id:'p1e', lbl:'English 🔤', col:'#10b981', items:[
+        {id:'p1e1',lbl:'Tenses (Simple, Continuous, Perfect)'},
+        {id:'p1e2',lbl:'Articles, Prepositions & Conjunctions'},
+        {id:'p1e3',lbl:'Vocabulary — Common words & synonyms'},
+      ]},
+    ]
+  },
+  {
+    id:'p2', lbl:'Phase 2', sub:'Core Topics', days:'May 24–Jun 1', col:'#3b82f6',
+    subjs:[
+      {id:'p2m', lbl:'Math 📐',      col:'#f97316', items:[
+        {id:'p2m1',lbl:'Quadratic Equations'},
+        {id:'p2m2',lbl:'Trigonometry — sin/cos/tan + identities'},
+        {id:'p2m3',lbl:'Statistics — Mean, Median, Mode'},
+        {id:'p2m4',lbl:'Probability basics'},
+        {id:'p2m5',lbl:'Coordinate Geometry — distance, midpoint'},
+        {id:'p2m6',lbl:'Arithmetic Progressions'},
+      ]},
+      {id:'p2p', lbl:'Physics ⚡',   col:'#3b82f6', items:[
+        {id:'p2p1',lbl:'Electricity — Ohm\'s Law, Resistance, Circuits'},
+        {id:'p2p2',lbl:'Light — Reflection & Refraction + lenses'},
+        {id:'p2p3',lbl:'Sound — Waves, Echo, Frequency'},
+        {id:'p2p4',lbl:'Gravitation — Universal law, g, weight'},
+        {id:'p2p5',lbl:'Magnetic Effects of Electric Current'},
+      ]},
+      {id:'p2c', lbl:'Chemistry 🧪', col:'#8b5cf6', items:[
+        {id:'p2c1',lbl:'Acids, Bases & Salts — properties & reactions'},
+        {id:'p2c2',lbl:'Metals & Non-metals — reactivity series'},
+        {id:'p2c3',lbl:'Carbon & its Compounds — hydrocarbons'},
+        {id:'p2c4',lbl:'Chemical Reactions & Equations — types'},
+        {id:'p2c5',lbl:'Periodic Classification — periods & groups'},
+      ]},
+    ]
+  },
+  {
+    id:'p3', lbl:'Phase 3', sub:'Revision', days:'Jun 2–7', col:'#8b5cf6',
+    subjs:[
+      {id:'p3a', lbl:'All Subjects 🔁', col:'#8b5cf6', items:[
+        {id:'p3_1',lbl:'Previous Year Paper — 2022 (full solve)'},
+        {id:'p3_2',lbl:'Previous Year Paper — 2023 (full solve)'},
+        {id:'p3_3',lbl:'Previous Year Paper — 2024 (full solve)'},
+        {id:'p3_4',lbl:'Previous Year Paper — 2025 (full solve)'},
+        {id:'p3_5',lbl:'Weak Topics Revision — Math'},
+        {id:'p3_6',lbl:'Weak Topics Revision — Physics'},
+        {id:'p3_7',lbl:'Weak Topics Revision — Chemistry'},
+        {id:'p3_8',lbl:'Final Mock Test + Error Analysis'},
+      ]},
+    ]
+  },
+];
+
+const ALL_IDS = PHASES.flatMap(ph => ph.subjs.flatMap(s => s.items.map(i => i.id)));
+
+const SUBJ_MAP = {
+  Math:      ['p1m1','p1m2','p1m3','p1m4','p2m1','p2m2','p2m3','p2m4','p2m5','p2m6'],
+  Physics:   ['p1p1','p1p2','p1p3','p2p1','p2p2','p2p3','p2p4','p2p5'],
+  Chemistry: ['p2c1','p2c2','p2c3','p2c4','p2c5'],
+  English:   ['p1e1','p1e2','p1e3'],
+};
+const SUBJ_COLS = {Math:'#f97316', Physics:'#3b82f6', Chemistry:'#8b5cf6', English:'#10b981'};
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+let S = {daily:{}, topics:{}, curPhase:'p1'};
+
+function save(){localStorage.setItem('hppat26',JSON.stringify(S))}
+function load(){
+  try{const r=localStorage.getItem('hppat26');if(r)S=JSON.parse(r)}catch(e){}
+  if(!S.daily)S.daily={};
+  if(!S.topics)S.topics={};
+  if(!S.curPhase)S.curPhase='p1';
+}
+
+// ═══════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════
+function dk(d){return (d||new Date()).toISOString().split('T')[0]}
+function todK(){return dk(new Date())}
+
+function daysLeft(){
+  const t=new Date();t.setHours(0,0,0,0);
+  const e=new Date(EXAM);
+  return Math.max(0,Math.ceil((e-t)/86400000));
+}
+
+function dayNum(){
+  const t=new Date();t.setHours(0,0,0,0);
+  const s=new Date(START);
+  const d=Math.ceil((t-s)/86400000)+1;
+  return Math.max(1,Math.min(22,d));
+}
+
+function curPhaseId(){
+  const d=dayNum();
+  return d<=7?'p1':d<=16?'p2':'p3';
+}
+
+function streak(){
+  let n=0;
+  const today=new Date();today.setHours(0,0,0,0);
+  for(let i=0;i<22;i++){
+    const d=new Date(today);d.setDate(d.getDate()-i);
+    const slots=S.daily[dk(d)]||{};
+    if(SLOTS.filter(s=>slots[s.id]).length===4)n++;
+    else if(i>0)break;
+  }
+  return n;
+}
+
+function topicsDone(){return ALL_IDS.filter(id=>S.topics[id]===2).length}
+function subjPct(subj){
+  const ids=SUBJ_MAP[subj];
+  return Math.round((ids.filter(id=>S.topics[id]===2).length/ids.length)*100);
+}
+function overallPct(){return Math.round((topicsDone()/ALL_IDS.length)*100)}
+
+function fmtDate(d){
+  const W=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${W[d.getDay()]}, ${d.getDate()} ${M[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+// ═══════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════
+function go(id){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  document.querySelector(`[data-s="${id}"]`).classList.add('on');
+  if(id==='s-dash')rDash();
+  if(id==='s-today')rToday();
+  if(id==='s-topics')rTopics();
+  if(id==='s-hist')rHist();
+}
+
+// ═══════════════════════════════════════════════════
+// RENDER: DASHBOARD
+// ═══════════════════════════════════════════════════
+function rDash(){
+  const dl=daysLeft(), dn=dayNum(), str=streak(), pct=overallPct();
+  const tk=todK(), ts=S.daily[tk]||{};
+  const tdone=SLOTS.filter(s=>ts[s.id]).length;
+
+  document.getElementById('d-badge').innerHTML=`
+    <div style="background:${dl<=7?'var(--re)':'var(--or)'};color:#fff;border-radius:12px;padding:6px 14px;font-size:13px;font-weight:700" class="mono">${dl} DAYS</div>
+    <div style="font-size:10px;color:var(--t3);margin-top:4px;text-align:right">Exam: 7 Jun</div>`;
+
+  document.getElementById('d-opct').textContent=pct+'%';
+  document.getElementById('d-obar').style.width=pct+'%';
+
+  document.getElementById('d-sg').innerHTML=`
+    <div class="sgc"><div class="sgn" style="color:var(--or)">${str}</div><div class="sgl">STREAK 🔥</div></div>
+    <div class="sgc"><div class="sgn" style="color:var(--bl)">Day ${dn}</div><div class="sgl">OF 22</div></div>
+    <div class="sgc"><div class="sgn" style="color:var(--gr)">${topicsDone()}</div><div class="sgl">TOPICS ✅</div></div>`;
+
+  document.getElementById('d-today').innerHTML=`
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-weight:700;font-size:14px">Aaj ka Progress</div>
+        <div class="mono" style="font-size:12px;color:var(--t2)">${tdone}/4 slots</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        ${SLOTS.map(s=>`
+          <div style="flex:1;text-align:center">
+            <div style="font-size:18px">${s.e}</div>
+            <div style="width:24px;height:24px;border-radius:6px;border:2px solid ${ts[s.id]?'var(--gr)':'var(--t3)'};background:${ts[s.id]?'var(--gr)':'transparent'};margin:5px auto 0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff">${ts[s.id]?'✓':''}</div>
+          </div>`).join('')}
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--t3);text-align:center">Tap to open full schedule →</div>
+    </div>`;
+
+  document.getElementById('d-subj').innerHTML=
+    Object.keys(SUBJ_MAP).map(subj=>{
+      const p=subjPct(subj), col=SUBJ_COLS[subj];
+      const done=SUBJ_MAP[subj].filter(id=>S.topics[id]===2).length;
+      const tot=SUBJ_MAP[subj].length;
+      return `<div class="sr">
+        <div class="st">
+          <span style="font-weight:700;color:${col}">${subj}</span>
+          <span class="mono" style="font-size:11px;color:var(--t2)">${done}/${tot} topics • ${p}%</span>
+        </div>
+        <div class="bt"><div class="bf" style="background:${col};width:${p}%"></div></div>
+      </div>`;
+    }).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// RENDER: TODAY
+// ═══════════════════════════════════════════════════
+function rToday(){
+  const tk=todK();
+  if(!S.daily[tk])S.daily[tk]={};
+  const ts=S.daily[tk];
+  const done=SLOTS.filter(s=>ts[s.id]).length;
+  const pct=Math.round((done/4)*100);
+  const ph=PHASES.find(p=>p.id===curPhaseId());
+
+  document.getElementById('t-date').textContent=fmtDate(new Date()).toUpperCase();
+  document.getElementById('t-badge').innerHTML=`
+    <div style="background:${done===4?'var(--gr)':'var(--bg3)'};border:1px solid ${done===4?'var(--gr)':'var(--bdr)'};color:${done===4?'#fff':'var(--t2)'};border-radius:12px;padding:6px 14px;font-size:13px;font-weight:700" class="mono">${done}/4</div>`;
+  document.getElementById('t-bar').style.cssText=`background:${done===4?'var(--gr)':'var(--or)'};width:${pct}%`;
+
+  document.getElementById('t-slots').innerHTML=SLOTS.map(s=>`
+    <div class="slot ${ts[s.id]?'done':''}" onclick="toggleSlot('${s.id}')">
+      <div class="cbx ${ts[s.id]?'on':''}">✓</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+          <span style="font-size:18px">${s.e}</span>
+          <span style="font-weight:700;font-size:14px;${ts[s.id]?'text-decoration:line-through;color:var(--t3)':''}">${s.n}</span>
+        </div>
+        <div class="mono" style="font-size:11px;color:var(--t3)">${s.time}</div>
+        <div style="font-size:11px;color:var(--t2);margin-top:2px">${s.tip}</div>
+      </div>
+      ${ts[s.id]?'<div style="font-size:10px;color:var(--gr);font-weight:700;letter-spacing:.1em;flex-shrink:0">DONE</div>':''}
+    </div>`).join('');
+
+  document.getElementById('t-msg').innerHTML=done===4?`
+    <div style="background:linear-gradient(135deg,#065f46,#047857);border-radius:14px;padding:16px;text-align:center;margin-bottom:12px">
+      <div style="font-size:28px">🎉</div>
+      <div style="font-weight:800;font-size:15px;margin-top:6px">Aaj ka din complete bhai!</div>
+      <div style="font-size:12px;color:#a7f3d0;margin-top:4px">Kal phir uthna 7 baje. Consistency hi jeetegi.</div>
+    </div>`:'';
+
+  document.getElementById('t-ptip').innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="width:8px;height:8px;border-radius:50%;background:${ph.col};flex-shrink:0"></div>
+      <div style="font-weight:700;font-size:13px">${ph.lbl} — ${ph.sub}</div>
+      <div style="margin-left:auto;font-size:10px;color:var(--t3)">${ph.days}</div>
+    </div>
+    ${ph.subjs.map(s=>`
+      <div style="font-size:12px;color:var(--t2);margin-bottom:4px">
+        <strong style="color:${s.col}">${s.lbl.split(' ')[0]}:</strong> ${s.items.map(i=>i.lbl).join(' · ')}
+      </div>`).join('')}`;
+}
+
+function toggleSlot(id){
+  const k=todK();
+  if(!S.daily[k])S.daily[k]={};
+  S.daily[k][id]=!S.daily[k][id];
+  save();rToday();
+}
+
+// ═══════════════════════════════════════════════════
+// RENDER: TOPICS
+// ═══════════════════════════════════════════════════
+function rTopics(){
+  const done=topicsDone(), tot=ALL_IDS.length, pct=Math.round((done/tot)*100);
+
+  document.getElementById('tp-badge').innerHTML=`
+    <div style="text-align:right">
+      <div style="font-size:24px;font-weight:800;color:var(--gr)">${pct}%</div>
+      <div style="font-size:10px;color:var(--t3)">${done}/${tot} done</div>
+    </div>`;
+
+  document.getElementById('tp-tabs').innerHTML=PHASES.map(ph=>`
+    <button class="tabb ${S.curPhase===ph.id?'on':''}"
+      style="${S.curPhase===ph.id?`background:${ph.col}`:''}; line-height:1.5"
+      onclick="setPhase('${ph.id}')">
+      ${ph.lbl}<br><span style="font-size:9px;opacity:.8">${ph.days}</span>
+    </button>`).join('');
+
+  const ph=PHASES.find(p=>p.id===S.curPhase);
+  document.getElementById('tp-content').innerHTML=ph.subjs.map(subj=>{
+    const sdn=subj.items.filter(i=>S.topics[i.id]===2).length;
+    return `<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+        <div style="font-weight:700;font-size:14px;color:${subj.col}">${subj.lbl}</div>
+        <div class="mono" style="font-size:11px;color:var(--t2)">${sdn}/${subj.items.length}</div>
+      </div>
+      <div style="margin-bottom:10px">
+        <div class="bt" style="height:4px;margin-top:6px">
+          <div class="bf" style="background:${subj.col};width:${Math.round(sdn/subj.items.length*100)}%"></div>
+        </div>
+      </div>
+      ${subj.items.map(item=>{
+        const st=S.topics[item.id]||0;
+        return `<div class="ti" onclick="cycTopic('${item.id}')">
+          <div class="td ${st===1?'prog':st===2?'done':''}">${st===2?'✓':st===1?'●':''}</div>
+          <div class="tt ${st===2?'dn':''}" style="${st===1?'color:var(--ye)':''}">${item.lbl}</div>
+          ${st===1?'<span style="font-size:9px;color:var(--ye);font-weight:700;flex-shrink:0">PADH RHA</span>':''}
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+function setPhase(id){S.curPhase=id;rTopics()}
+function cycTopic(id){S.topics[id]=((S.topics[id]||0)+1)%3;save();rTopics()}
+
+// ═══════════════════════════════════════════════════
+// RENDER: HISTORY
+// ═══════════════════════════════════════════════════
+function rHist(){
+  const str=streak();
+  document.getElementById('h-streak').innerHTML=`
+    <div style="background:var(--or);color:#fff;border-radius:12px;padding:6px 16px;font-size:16px;font-weight:800">${str} 🔥</div>
+    <div style="font-size:10px;color:var(--t3);text-align:right;margin-top:4px">Day streak</div>`;
+
+  // Calendar — May 17 is Sunday (dow=0), no padding needed
+  const todK2=todK(), examK=dk(EXAM);
+  let calH='';
+  for(let i=0;i<22;i++){
+    const d=new Date(START);d.setDate(d.getDate()+i);
+    const k=dk(d);
+    const slots=S.daily[k]||{};
+    const done=SLOTS.filter(s=>slots[s.id]).length;
+    let cls='cd';
+    if(k===examK) cls+=' exam';
+    else if(k===todK2) cls+=' tod';
+    else if(k>todK2) cls='cd';
+    else if(done===4) cls+=' full';
+    else if(done>0) cls+=' part';
+    calH+=`<div class="${cls}" title="${fmtDate(d)}">${d.getDate()}</div>`;
+  }
+  document.getElementById('h-cal').innerHTML=calH;
+
+  // Phase breakdown
+  const phases=[
+    {lbl:'Phase 1 — Foundation',r:[0,6], col:'#f97316'},
+    {lbl:'Phase 2 — Core',      r:[7,15],col:'#3b82f6'},
+    {lbl:'Phase 3 — Revision',  r:[16,21],col:'#8b5cf6'},
+  ];
+  document.getElementById('h-phases').innerHTML=phases.map(ph=>{
+    let full=0,part=0;
+    const tot=ph.r[1]-ph.r[0]+1;
+    for(let i=ph.r[0];i<=ph.r[1];i++){
+      const d=new Date(START);d.setDate(d.getDate()+i);
+      const slots=S.daily[dk(d)]||{};
+      const done=SLOTS.filter(s=>slots[s.id]).length;
+      if(done===4)full++;else if(done>0)part++;
+    }
+    return `<div class="card" style="border-left:3px solid ${ph.col};margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-weight:700;font-size:13px">${ph.lbl}</div>
+        <div class="mono" style="font-size:10px;color:var(--t2)">${full}/${tot} full</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        ${[['FULL',full,'var(--gr)'],['PARTIAL',part,'var(--ye)'],['MISSED',tot-full-part,'var(--re)']].map(([l,v,c])=>`
+          <div style="flex:1;background:var(--bg3);border-radius:10px;padding:10px 6px;text-align:center">
+            <div style="font-size:20px;font-weight:800;color:${c}">${v}</div>
+            <div style="font-size:9px;color:var(--t3)">${l}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Stats
+  let days=0,sessions=0;
+  Object.entries(S.daily).forEach(([k,slots])=>{
+    const d=SLOTS.filter(s=>slots[s.id]).length;
+    if(d>0){days++;sessions+=d;}
+  });
+
+  document.getElementById('h-stats').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${[
+        ['Days Studied',days,'var(--or)'],
+        ['Sessions Done',sessions,'var(--bl)'],
+        ['Topics Clear',topicsDone(),'var(--gr)'],
+        ['Current Streak',str+'🔥','var(--ye)'],
+      ].map(([l,v,c])=>`
+        <div style="background:var(--bg3);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:22px;font-weight:800;color:${c}">${v}</div>
+          <div style="font-size:9px;color:var(--t3);letter-spacing:.08em;margin-top:4px">${l.toUpperCase()}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+load();
+rDash();
+</script>
+</body>
+</html>
